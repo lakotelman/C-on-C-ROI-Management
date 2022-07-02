@@ -1,4 +1,4 @@
-from main import User, AppControl, t1, AppView, Property
+from main import User, AppControl, AppView, Property
 import unittest
 
 
@@ -18,12 +18,17 @@ class TestControls(unittest.TestCase):
 
     def test_control_edit_user_delete(self):
         a = AppControl()
+        t1 = User("BillyBob")
+        a.all_users[t1.profile_name] = t1
+        a.active_user = t1
         a.control_edit_user(t1, "delete")
         self.assertEqual(a.active_user, None)
         self.assertNotIn(t1, a.all_users)
 
     def test_control_edit_user_rename(self):
         a = AppControl()
+        t1 = User("BillyBob")
+        a.active_user = t1
         a.control_edit_user(t1, "rename", "billybob")
         self.assertEqual(t1.profile_name, "billybob")
 
@@ -33,8 +38,7 @@ class TestControls(unittest.TestCase):
         a.active_user = u
         p = Property("4242 Bag End", 1000, 800, 100)
         a.control_add_property(p)
-        self.assertIn(p, u.portfolio.values())
-
+        self.assertIn(p.address, u.portfolio)
 
     def test_control_edit_property(self):
         a = AppControl()
@@ -55,16 +59,21 @@ class TestControls(unittest.TestCase):
     def test_control_edit_property_delete(self):
         u = User("Bilbo Baggins")
         a = AppControl()
+        a.active_user = u
         p = Property("4242 Bag End Ln", 1000, 800, 10000)
         a.control_add_property(p)
         a.control_edit_property(p, "delete")
         self.assertNotIn(p, u.portfolio)
+
 
 class TestProperty(unittest.TestCase):
     def test_property_init(self):
         p = Property("3145 Bag End Ln", 1000, 800, 10000)
         self.assertEqual(p.net, 200)
         self.assertEqual(p.roi, 24)
+
+
+#TODO Add Test to see if the functionality for maintaining instances across App runs is working.
 
 
 if __name__ == "__main__":

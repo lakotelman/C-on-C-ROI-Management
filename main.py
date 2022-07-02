@@ -1,4 +1,8 @@
-from attr import attrib
+# class AllApps:
+#     def __init__(self):
+#         pass
+#     self.allapps = {}
+# TODO Would this be the way to maintain a list of existing apps for users to choose across application runs?
 
 
 class User:
@@ -18,6 +22,7 @@ class User:
     ==========================================
     Cash on Cash Return on Investment: %{prop_obj.roi}\n"""
             )
+
 
 class AppControl:
     def __init__(self):
@@ -66,12 +71,12 @@ class AppControl:
 
 
 class AppView:
-    def __init__(self, controller, team):
+    def __init__(self, controller, team_name):
         self.controller = controller
-        self.team = team
-        self.teams_list = {}
-        self.teams.append(self)
-        print("="*10, "Welcome to your Portfolio!", "="*10)
+        self.team_name = team_name
+        # self.teams_dict = all_teams[team_name] = self
+        # TODO See comment on line 5
+        print("=" * 10, "Welcome to your Portfolio!", "=" * 10)
 
     def view_create_user(self):
         profile_name = input("What would you like your account name to be? ")
@@ -147,7 +152,9 @@ class AppView:
             print(f"[{i+1}] {property[0].title()}")
             choice_dict[str(i + 1)] = property[1]
         toggle = input("\nWhich property would you like to edit? ")
-        option = input("[1] Change details\n[2] Delete the property from your portfolio? ")
+        option = input(
+            "[1] Change details\n[2] Delete the property from your portfolio? "
+        )
         if option == "2":
             print("Are you sure? This cannot be undone ")
             check = input("Type the address of your property to confirm ")
@@ -180,7 +187,9 @@ class AppView:
                         choice_dict[toggle], "revise", upd_income=revision
                     )
                     print(f"Updated {choice_dict[toggle].address} income")
-                loop = input("\nWould you like to make more revisions to this property? [Y/N] ")
+                loop = input(
+                    "\nWould you like to make more revisions to this property? [Y/N] "
+                )
                 if loop.lower() == "n":
                     break
                     editing = False
@@ -199,7 +208,7 @@ class AppView:
                 )
                 self.view_toggle_user()
             print("\nWhat would you like to do?")
-            print(f"Active User: {self.controller.active_user.profile_name.title()}") 
+            print(f"Active User: {self.controller.active_user.profile_name.title()}")
             print(
                 """
 [1] Change Profile
@@ -240,15 +249,22 @@ class Property:
         self.net = self.gross - self.expenses
         self.roi = int(((self.net * 12) / self.investment) * 100)
 
+
+t = AppControl()
+puppies = AppView(t, "puppies")
+
+
 def main():
+    # all_teams = AllApps() #TODO See comment on line 5 about maintaining apps
     team_name = input("What is your team name? ")
-    if team_name.lower().strip() in AppView.teams: 
-        print("Welcome Back!")
-        team_name.run
-    else:
-        control = AppControl()
-        team_name = AppView(control, team_name)
-        team_name.run()
+    # if team_name in AppView.teams_dict:
+    #     print("Welcome Back!")
+    #     team_name.run
+    # else:
+    control = AppControl()
+    team_name = AppView(control, team_name)
+    team_name.run()
+
 
 if __name__ == "__main__":
     main()
