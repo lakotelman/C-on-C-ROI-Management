@@ -19,15 +19,10 @@ class User:
     Cash on Cash Return on Investment: %{prop_obj.roi}\n"""
             )
 
-
-t1 = User("mr.monopoly")
-t2 = User("mr.green")
-
-
 class AppControl:
     def __init__(self):
-        self.all_users = {t1.profile_name: t1, t2.profile_name: t2}
-        self.active_user = t1
+        self.all_users = {}
+        self.active_user = None
 
     def control_create_user(self, user):
         self.all_users[user.profile_name] = user
@@ -44,10 +39,8 @@ class AppControl:
             user_obj.profile_name = new_name
 
     def control_add_property(self, property):
-        self.all_users[self.active_user.profile_name].portfolio[
-            property.address
-        ] = property
-        return self.all_users[self.active_user.profile_name]
+        self.active_user.portfolio[property.address] = property
+        return self.active_user
 
     def control_edit_property(
         self,
@@ -73,8 +66,12 @@ class AppControl:
 
 
 class AppView:
-    def __init__(self, controller):
+    def __init__(self, controller, team):
         self.controller = controller
+        self.team = team
+        self.teams_list = {}
+        self.teams.append(self)
+        print("="*10, "Welcome to your Portfolio!", "="*10)
 
     def view_create_user(self):
         profile_name = input("What would you like your account name to be? ")
@@ -139,6 +136,7 @@ class AppView:
         print(
             f"\nExcellent, we added {p.address.title()} to your investment portfolio. You are getting a %{p.roi} return on investment. Neat.\n"
         )
+        return
 
     def view_edit_property(self):
         if not self.controller.active_user:
@@ -149,40 +147,40 @@ class AppView:
             print(f"[{i+1}] {property[0].title()}")
             choice_dict[str(i + 1)] = property[1]
         toggle = input("\nWhich property would you like to edit? ")
-        print("What would you like to do?")
-        option = "[1] Change details\n [2] Delete the property from your portfolio? "
+        option = input("[1] Change details\n[2] Delete the property from your portfolio? ")
         if option == "2":
             print("Are you sure? This cannot be undone ")
             check = input("Type the address of your property to confirm ")
             if check.lower() == choice_dict[toggle].address:
                 self.controller.control_edit_property(choice_dict[toggle], "delete")
+                print(f"Deleted {choice_dict[toggle].address}")
         if option == "1":
             editing = True
             while editing == True:
-                print("Which detail would you like to change?")
+                print("Which detail would you like to change? ")
                 edit = input("[1]Address [2]Investment [3]Expenses [4]Income")
                 revision = input("What is your new value? ")
                 if edit == "1":
                     self.controller.control_edit_property(
                         choice_dict[toggle], "revise", upd_address=revision
                     )
-                    print(f"Updated {choice_dict[toggle]} address")
+                    print(f"Updated {choice_dict[toggle].address} address")
                 if edit == "2":
                     self.controller.control_edit_property(
                         choice_dict[toggle], "revise", upd_investment=revision
                     )
-                    print(f"Updated {choice_dict[toggle]} investment")
+                    print(f"Updated {choice_dict[toggle].address} investment")
                 if edit == "3":
                     self.controller.control_edit_property(
                         choice_dict[toggle], "revise", upd_expenses=revision
                     )
-                    print(f"Updated {choice_dict[toggle]} expenses")
+                    print(f"Updated {choice_dict[toggle].address} expenses")
                 if edit == "4":
                     self.controller.control_edit_property(
                         choice_dict[toggle], "revise", upd_income=revision
                     )
-                    print(f"Updated {choice_dict[toggle]} income")
-                loop = "Would you like to make more revisions to this property? [Y/N] "
+                    print(f"Updated {choice_dict[toggle].address} income")
+                loop = input("\nWould you like to make more revisions to this property? [Y/N] ")
                 if loop.lower() == "n":
                     break
                     editing = False
@@ -190,12 +188,10 @@ class AppView:
                     continue
 
     def run(self):
-        if self.controller.active_user:
-            print(f"Active User: {self.controller.active_user.profile_name.title()}")
         run = True
         while run == True:
-            if self.controller.all_users is False:
-                print("Let's add a user to get you started!\n")
+            if not self.controller.all_users:
+                print("Let's add a user to get you started.\n")
                 self.view_create_user()
             if self.controller.active_user is None:
                 print(
@@ -203,6 +199,7 @@ class AppView:
                 )
                 self.view_toggle_user()
             print("\nWhat would you like to do?")
+            print(f"Active User: {self.controller.active_user.profile_name.title()}") 
             print(
                 """
 [1] Change Profile
@@ -243,8 +240,15 @@ class Property:
         self.net = self.gross - self.expenses
         self.roi = int(((self.net * 12) / self.investment) * 100)
 
+def main():
+    team_name = input("What is your team name? ")
+    if team_name.lower().strip() in AppView.teams: 
+        print("Welcome Back!")
+        team_name.run
+    else:
+        control = AppControl()
+        team_name = AppView(control, team_name)
+        team_name.run()
 
 if __name__ == "__main__":
-    t1c = AppControl()
-    t1 = AppView(t1c)
-    t1.run()
+    main()

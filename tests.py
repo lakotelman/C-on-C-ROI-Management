@@ -28,7 +28,13 @@ class TestControls(unittest.TestCase):
         self.assertEqual(t1.profile_name, "billybob")
 
     def test_control_add_property(self):
-        pass
+        a = AppControl()
+        u = User("Bilbo Baggins")
+        a.active_user = u
+        p = Property("4242 Bag End", 1000, 800, 100)
+        a.control_add_property(p)
+        self.assertIn(p, u.portfolio.values())
+
 
     def test_control_edit_property(self):
         a = AppControl()
